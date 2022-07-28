@@ -6,9 +6,9 @@
 class yexit : public CommandItem
 {
     public:
-        void execute()
+        void execute(std::vector<std::string> args)
         {
-            std::cout << "\033[0;30;43m[Warning] " << "Exiting..." << "\033[0m" << std::endl;  
+            std::cout << "\033[0;97;43m[Warning] " << "Exiting..." << "\033[0m" << std::endl;  
             std::exit(0);
         }
 

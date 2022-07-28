@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 // Including system files
 #include "CommandItem.h"
@@ -10,6 +11,7 @@
 #include "impl/test.cpp"
 #include "impl/yexit.cpp"
 #include "impl/about.cpp"
+#include "impl/say.cpp"
 
 // Command class (mostly coded by Venodez (ty))
 class Command
@@ -24,13 +26,18 @@ class Command
 			commands["test"] = new test();
             commands["exit"] = new yexit();
             commands["about"] = new about();
+            commands["say"] = new say();
 		}
 
         // Execute the command by searching for the command name in the commands map
         void execute(std::string command)
         {
+            StringExtension stringExtension;
+
+            //temps
+            std::vector<std::string> args = stringExtension.split(command, " ");
+
             std::unordered_map<std::string, CommandItem*>::iterator cmd = commands.find(command);
-			StringExtension stringExtension;
             bool hasBeenFound = false;
 
             // Check if is help command
@@ -45,19 +52,23 @@ class Command
             {   
                 if(!hasBeenFound)
                 {
-                    if(stringExtension.caseInsensitiveStringCompare(command, cmd->first))
+                    if(stringExtension.caseInsensitiveStringCompare(args[0], cmd->first))
                     {
+                        //removing command from the vector list
+                        args.erase(args.begin());
+
                         // Execute the command
-                        cmd->second->execute();
+                        cmd->second->execute(args);
                         hasBeenFound = true;
                     }
                 }
             }
             // If the command is not found
             if(!hasBeenFound)
-                std::cout << "\033[0;30;41m[Error] "<< "Command not found" << "\033[0m" << std::endl;
+                std::cout << "\033[0;97;41m[Error] "<< "Command not found" << "\033[0m" << std::endl;
 
             // When task end, call the console
+            std::cout << std::endl;
             Console();     
         }
 
@@ -76,7 +87,7 @@ class Command
         void Console()
         {
             std::string command;
-            std::cout << "@User:yshcpp> ";
+            std::cout << "\033[0;92m@User\033[0m:\033[0;94myshcpp\033[0m$ ";
             std::getline(std::cin, command);
             execute(command);
         }

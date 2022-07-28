@@ -12,4 +12,22 @@ class StringExtension
             std::transform( str2Cpy.begin(), str2Cpy.end(), str2Cpy.begin(), ::tolower );
             return ( str1Cpy == str2Cpy );
         }
+
+        std::vector<std::string> split(std::string str, std::string token)
+        {
+            std::vector<std::string>result;
+            while(str.size()){
+                int index = str.find(token);
+                if(index!=std::string::npos)
+                {
+                    result.push_back(str.substr(0,index));
+                    str = str.substr(index+token.size());
+                    if(str.size()==0)result.push_back(str);
+                }else{
+                    result.push_back(str);
+                    str = "";
+                }
+            }
+            return result;
+        }
 };
