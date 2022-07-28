@@ -2,3 +2,5 @@
 YSHCPP.sln
 YSHCPP/x64
 *.o
+*.exe
+YSH
