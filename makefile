@@ -19,3 +19,7 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+commit:
+	git add .
+	git commit -a
