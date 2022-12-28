@@ -4,9 +4,10 @@
 class about : public CommandItem
 {
     public:
-        void execute(std::vector<std::string> args)
+        int execute(std::vector<std::string> args)
         {
             std::cout << "YSHCPP build " << 2 << std::endl;
+            return 0;
         }
 
         std::string name()

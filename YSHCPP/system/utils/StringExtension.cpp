@@ -1,5 +1,6 @@
 #include <string>
 #include <bits/stdc++.h>
+#include <algorithm>
 
 class StringExtension
 {
@@ -26,6 +27,26 @@ class StringExtension
                 }else{
                     result.push_back(str);
                     str = "";
+                }
+            }
+            return result;
+        }
+
+        std::string replace(std::string str, std::string from, std::string to)
+        {
+            const std::string result = std::regex_replace(str, std::regex(from), to);
+            return result;
+        }
+
+        std::string convertVectorToString(std::vector<std::string> vector)
+        {
+            std::string result = "";
+            for(int i = 0; i < vector.size(); i++)
+            {
+                result += vector[i];
+                if(i != vector.size() - 1)
+                {
+                    result += " ";
                 }
             }
             return result;

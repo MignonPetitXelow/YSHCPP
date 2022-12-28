@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 #include "../utils/StringExtension.cpp"
 
@@ -25,8 +26,20 @@ class FilesManager
             struct stat buffer;
             bool result (stat (path.c_str(), &buffer) == 0);
 
-            std::cout << path << std::endl;
-            std::cout << result << std::endl;
+            
+            return result;
+        }
+
+        bool folderExists(std::string folder)
+        {
+            StringExtension stringExtension;
+            std::string path = folder;
+
+            path = stringExtension.replace(path, " ", "/");
+
+            struct stat buffer;
+            bool result (stat (path.c_str(), &buffer) == 0);
+
             
             return result;
         }
@@ -35,6 +48,7 @@ class FilesManager
         {
             std::ifstream file;
             std::vector<std::string> res;
+            StringExtension str;
 
             file.open(path,std::ios::in);
             if (file.is_open())
@@ -42,8 +56,7 @@ class FilesManager
                 std::string line;
                 while(getline(file, line))
                 {
-                    res.push_back(line);
-                    std::cout << line << std::endl;
+                    res.push_back(str.replace(line, " ", ""));
                 }
                 file.close(); 
             }
@@ -92,18 +105,63 @@ class FilesManager
 
         std::string getVarFromFile(std::string path, int line)
         {
-            return read(path)[line];
+            std::string tempsVar = read(path)[line];
+            return tempsVar;
         }
 
         void Goto(std::string arg)
         {
-            dir = arg;
-            std::cout << dir << std::endl;
+            writeLine("YSHCppFiles/yshcppconfig.yco",4,arg);
         }
 
         std::string getExecDir()
         {
-            return dir;
+            return read("YSHCppFiles/yshcppconfig.yco")[3];
+        }
+
+        void initSystemFiles()
+        {
+            StringExtension str;
+            std::string directory = "YSHCppFiles";
+            std::vector<std::string> configContents = str.split("#Username: ?yshcpp ?#Directory: ?/mnt/", "?");
+
+            if(!folderExists(directory))
+            {
+                std::cout << "\033[0;97;43m[Warning] " <<"creating system files..." << "\033[0m" << std::endl;
+                createFolder(directory);
+                createFile(directory+"/yshcppconfig.yco", configContents);
+
+
+                std::cout << "\033[0;97;42m[Success] " << "every files has been created" << "\033[0m" << std::endl << std::endl;
+            }
+        }
+
+        int createFolder(std::string path)
+        {
+            return mkdir(path.c_str(), 7777);
+        }
+
+        int removeFolder(std::string path)
+        {
+            return rmdir(path.c_str());
+        }
+
+        void createFile(std::string path)
+        {
+            std::ofstream file(path);
+            file.close();
+        }
+
+        void createFile(std::string path, std::vector<std::string> contents)
+        {
+            std::ofstream file(path);
+            std::string content;
+            for(int i = 0; i < contents.size(); ++i)
+            {
+                content += contents[i] + "\n";
+            }
+            file << content;
+            file.close();
         }
 
 };

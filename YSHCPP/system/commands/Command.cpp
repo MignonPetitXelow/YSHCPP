@@ -5,89 +5,95 @@
 
 // Including system files
 #include "CommandItem.h"
-#include "../utils/StringExtension.cpp"
 
 // Including the command items
 #include "impl/test.cpp"
 #include "impl/yexit.cpp"
 #include "impl/about.cpp"
 #include "impl/say.cpp"
+#include "impl/cd.cpp"
+#include "impl/foda.cpp"
+#include "impl/fode.cpp"
 
 // Command class (mostly coded by Venodez (ty))
 class Command
 {
 	public:
+        FilesManager fm;
         std::unordered_map<std::string, CommandItem*> commands;
 
-        // Initialize the command system
 		void init()
 		{
-            // Adding all the command items
 			commands["test"] = new test();
             commands["exit"] = new yexit();
             commands["about"] = new about();
             commands["say"] = new say();
+            commands["cd"] = new cd();
+            commands["foda"] = new foda();
+            commands["fode"] = new fode();
 		}
 
-        // Execute the command by searching for the command name in the commands map
         void execute(std::string command)
         {
+            if(command == "" || command.size() > 64)
+            {
+                std::cout << "\n\033[0;97;43m[Warning] " << "Illegal arguments" << "\033[0m" << std::endl; 
+
+                Console(); 
+                return;
+            }
             StringExtension stringExtension;
 
-            //temps
             std::vector<std::string> args = stringExtension.split(command, " ");
 
             std::unordered_map<std::string, CommandItem*>::iterator cmd = commands.find(command);
             bool hasBeenFound = false;
 
-            // Check if is help command
             if(stringExtension.caseInsensitiveStringCompare(command, "help"))
             {
                     printHelp();
                     hasBeenFound = true;
             }   
 
-            // Trying to found the command
             for (std::unordered_map<std::string, CommandItem*>::iterator cmd = commands.begin(); cmd != commands.end(); ++cmd)
             {   
                 if(!hasBeenFound)
                 {
                     if(stringExtension.caseInsensitiveStringCompare(args[0], cmd->first))
                     {
-                        //removing command from the vector list
                         args.erase(args.begin());
 
-                        // Execute the command
-                        cmd->second->execute(args);
+                        int retcode = cmd->second->execute(args);
                         hasBeenFound = true;
+
+                        if(retcode > 0)
+                            std::cout << "\n\033[0;97;41m[TASK-ERR] "<< "Task \'cmd@"+cmd->second->name()+"\' ended with error code: "<< retcode << "\033[0m" << std::endl;
                     }
                 }
             }
-            // If the command is not found
             if(!hasBeenFound)
-                std::cout << "\033[0;97;41m[Error] "<< "Command not found" << "\033[0m" << std::endl;
+                std::cout << "\n\033[0;97;41m[Error] "<< "Command not found" << "\033[0m" << std::endl;
 
-            // When task end, call the console
             std::cout << std::endl;
             Console();     
         }
 
         void printHelp()
         {
-            std::cout << "YSHCPP commands:" << std::endl;
-            
-            // Print all the commands
+            std::string out = "YSHCPP commands: \n";
+            out += " > help - show all commands\n";
             for (std::unordered_map<std::string, CommandItem*>::iterator cmd = commands.begin(); cmd != commands.end(); ++cmd)
             {
-                std::cout << " > " << cmd->first << " - " << cmd->second->description() << std::endl;
+                out += " > "+cmd->first+" - "+cmd->second->description()+"\n";
             }
-            std::cout << " > " << "help" << " - " << "show all commands" << std::endl;
+            std::cout << out;
         }
 
         void Console()
         {
+            std::vector<std::string> read = fm.read("YSHCppFiles/yshcppconfig.yco");
             std::string command;
-            std::cout << "\033[0;92m@User\033[0m:\033[0;94myshcpp\033[0m$ ";
+            std::cout << "\033[0;92m"+read[1]+"@YshCpp\033[0m:\033[0;94m"+read[3]+"\033[0m$ ";
             std::getline(std::cin, command);
             execute(command);
         }

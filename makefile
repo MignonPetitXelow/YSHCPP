@@ -23,3 +23,6 @@ re: fclean all
 commit:
 	git add .
 	git commit -a
+
+run: re 
+	./$(NAME)
